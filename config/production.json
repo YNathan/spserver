@@ -1,0 +1,11 @@
+{
+  "MySql": {
+      "host": "",
+      "user": "",
+      "password":"",
+      "database":"comroads"
+  },
+  "Server":{
+    "port": 5611
+  }
+}
