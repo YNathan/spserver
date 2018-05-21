@@ -1,6 +1,7 @@
 var mysql = require('mysql');
 var connection;
 var dateFormat = require('dateformat');
+
 function handleDisconnect() {
     connection = mysql.createConnection(""); // Recreate the connection, since
     // the old one cannot be reused.
@@ -25,6 +26,135 @@ function handleDisconnect() {
 }
 
 //handleDisconnect();
-exports.getCorrections = function(req,res){
+exports.getCorrections = function (req, res) {
+    var response = {
+        "code": 200,
+        "correctionsList": []
+    }
+    var correctionsList = [];
+    connection.query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_CATALOG='dbName' AND NOT TABLE_NAME = dictionary;", function (error, results, fields) {
+        if (error) {
+            console.log("error ocurred", error);
+            res.send({
+                "code": 400,
+                "failed": "error ocurred"
+            })
+        } else {
+            var tablesName = results;
+            connection.query("SELECT * from dictionary", function (error, results, fields) {
+                if (error) {
+                    console.log("error ocurred", error);
+                    res.send({
+                        "code": 400,
+                        "failed": "error ocurred"
+                    })
+                } else {
+                    var dictionaryName = results;
+                    for (var sqlIdx in tablesName) {
+                        for (var dictIdx in dictionaryName) {
+                            if (tablesName[sqlIdx] == dictionaryName[dictIdx]) {
+                                correctionsList.push(dictionaryName[dictIdx]);
+                            }
 
+                        }
+                    }
+                    response.correctionsList = correctionsList;
+                    res.send(response);
+                }
+            });
+        }
+    });
+
+}
+exports.getCompanys = function (req, res) {
+    var response = {
+        "code": 200,
+        "companysList": []
+    }
+    var correction_table = req.body.correction;
+    var companysList = [];
+    connection.query("SELECT company from " + correction_table , function (error, results, fields) {
+        if (error) {
+            console.log("error ocurred", error);
+            res.send({
+                "code": 400,
+                "failed": "error ocurred"
+            })
+        } else {
+            companysList = results;
+            response.companysList = companysList;
+            res.send(response);
+        }
+    });
+}
+exports.getModel = function (req, res) {
+    var response = {
+        "code": 200,
+        "modelsList": []
+    }
+    var correction_table = req.body.correction;
+    var company_name = req.body.company;
+    var modelList = [];
+    connection.query("SELECT model from " + correction_table + " where company = '" + company_name+"'", function (error, results, fields) {
+        if (error) {
+            console.log("error ocurred", error);
+            res.send({
+                "code": 400,
+                "failed": "error ocurred"
+            })
+        } else {
+            modelList = results;
+            response.modelList = modelList;
+            res.send(response);
+        }
+    });
+}
+
+exports.getDeviceName = function (req, res) {
+    var response = {
+        "code": 200,
+        "deviceNamesList": []
+    }
+    var correction_table = req.body.correction;
+    var company_name = req.body.company;
+    var model_name = req.body.model;
+    var deviceNamesList = [];
+    connection.query("SELECT device_name from " + correction_table + " where company = '" + company_name + "' and device_name = '" + model_name +"'", function (error, results, fields) {
+        if (error) {
+            console.log("error ocurred", error);
+            res.send({
+                "code": 400,
+                "failed": "error ocurred"
+            })
+        } else {
+            deviceNamesList = results;
+            response.deviceNamesList = deviceNamesList;
+            res.send(response);
+        }
+    });
+}
+
+exports.getData = function (req, res) {
+    var response = {
+        "code": 200,
+        "data_list": []
+    }
+    var correction_table = req.body.correction;
+    var company_name = req.body.company;
+    var model_name = req.body.model;
+    var device_name = req.body.device_name;
+    var dataList = [];
+    connection.query("SELECT device_name from " + correction_table + " where company = '" + company_name + "' and device_name = '" + model_name +"' and device_name"+device_name+"'", function (error, results, fields) {
+        if (error) {
+            console.log("error ocurred", error);
+            res.send({
+                "code": 400,
+                "failed": "error ocurred"
+            })
+        } else {
+            dataList = results;
+            response.data_list = dataList;
+            res.send(response);
+        }
+    });
 }
