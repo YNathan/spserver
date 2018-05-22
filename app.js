@@ -1,4 +1,5 @@
 var express = require("express");
+var config = require('config');
 var path = require('path');
 var bodyParser = require('body-parser');
 var getData = require('./routes/getData');
@@ -14,8 +15,12 @@ app.use(function (req, res, next) {
 });
 var router = express.Router();
 
-router.get('/get_correction', getData.getCorrections);
-
+router.get('/get_dictionary', getData.getDictionary);
+router.get('/get_corrections', getData.getCorrections);
+router.post('/get_companys', getData.getCompanys);
+router.post('/get_model', getData.getModel);
+router.get('/get_device_name', getData.getDeviceName);
+router.get('/get_dictionary', getData.getDictionary);
 // test route
 router.get('/', function (req, res) {
     res.sendFile(__dirname +'/public/index.html');
@@ -25,6 +30,6 @@ router.get('/', function (req, res) {
 
 
 app.use('/api', router);
-app.listen(5000);
+app.listen(config.get("Server.port"));
 console.log("server is up")
 

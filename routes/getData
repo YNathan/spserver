@@ -1,38 +1,14 @@
 var mysql = require('mysql');
+var config = require('config');
 var connection;
 var dateFormat = require('dateformat');
 
-function handleDisconnect() {
-    connection = mysql.createConnection(""); // Recreate the connection, since
-    // the old one cannot be reused.
-
-    connection.connect(function (err) {              // The server is either down
-        if (err) {                                     // or restarting (takes a while sometimes).
-            console.log(dateFormat(new Date(), "yyyy-mm-dd HH:MM:ss:l"), "INFO", 'error when in  connecting to db:', err);
-            setTimeout(handleDisconnect, 2000); // We introduce a delay before attempting to reconnect,
-        } else {
-            console.log(dateFormat(new Date(), "yyyy-mm-dd HH:MM:ss:l"), "INFO", "Database in  module is connected ... nn");
-        }                                     // to avoid a hot loop, and to allow our node script to
-    });                                     // process asynchronous requests in the meantime.
-                                            // If you're also serving http, display a 503 error.
-    connection.on('error', function (err) {
-        console.log('db error', err);
-        if (err.code === 'PROTOCOL_CONNECTION_LOST') { // Connection to the MySQL server is usually
-            handleDisconnect();                         // lost due to either server restart, or a
-        } else {                                      // connnection idle timeout (the wait_timeout
-            throw err;                                  // server variable configures this)
-        }
-    });
-}
-
-//handleDisconnect();
-exports.getCorrections = function (req, res) {
+exports.getDictionary = function (req, res) {
     var response = {
         "code": 200,
-        "correctionsList": []
+        "dictionary": []
     }
-    var correctionsList = [];
-    connection.query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_CATALOG='dbName' AND NOT TABLE_NAME = dictionary;", function (error, results, fields) {
+    mysql.createConnection(config.get('MySql')).query("SELECT * from dictionary", function (error, results, fields) {
         if (error) {
             console.log("error ocurred", error);
             res.send({
@@ -40,28 +16,30 @@ exports.getCorrections = function (req, res) {
                 "failed": "error ocurred"
             })
         } else {
-            var tablesName = results;
-            connection.query("SELECT * from dictionary", function (error, results, fields) {
-                if (error) {
-                    console.log("error ocurred", error);
-                    res.send({
-                        "code": 400,
-                        "failed": "error ocurred"
-                    })
-                } else {
-                    var dictionaryName = results;
-                    for (var sqlIdx in tablesName) {
-                        for (var dictIdx in dictionaryName) {
-                            if (tablesName[sqlIdx] == dictionaryName[dictIdx]) {
-                                correctionsList.push(dictionaryName[dictIdx]);
-                            }
+            var dictionaryName = results;
+            response.dictionary = dictionaryName;
+            res.send(response);
+        }
+    });
 
-                        }
-                    }
-                    response.correctionsList = correctionsList;
-                    res.send(response);
-                }
-            });
+
+}
+exports.getCorrections = function (req, res) {
+    var response = {
+        "code": 200,
+        "correctionsList": []
+    }
+    var correctionsList = [];
+    mysql.createConnection(config.get('MySql')).query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'speakerphoneco_laboratory' AND NOT TABLE_NAME = 'dictionary'", function (error, results, fields) {
+        if (error) {
+            console.log("error ocurred", error);
+            res.send({
+                "code": 400,
+                "failed": "error ocurred"
+            })
+        } else {
+            response.correctionsList = results;
+            res.send(response);
         }
     });
 
@@ -69,11 +47,13 @@ exports.getCorrections = function (req, res) {
 exports.getCompanys = function (req, res) {
     var response = {
         "code": 200,
+        "post": "post successful",
         "companysList": []
     }
+
     var correction_table = req.body.correction;
     var companysList = [];
-    connection.query("SELECT company from " + correction_table , function (error, results, fields) {
+    mysql.createConnection(config.get('MySql')).query("SELECT company from " + correction_table, function (error, results, fields) {
         if (error) {
             console.log("error ocurred", error);
             res.send({
@@ -95,7 +75,7 @@ exports.getModel = function (req, res) {
     var correction_table = req.body.correction;
     var company_name = req.body.company;
     var modelList = [];
-    connection.query("SELECT model from " + correction_table + " where company = '" + company_name+"'", function (error, results, fields) {
+    connection.query("SELECT model from " + correction_table + " where company = '" + company_name + "'", function (error, results, fields) {
         if (error) {
             console.log("error ocurred", error);
             res.send({
@@ -119,7 +99,7 @@ exports.getDeviceName = function (req, res) {
     var company_name = req.body.company;
     var model_name = req.body.model;
     var deviceNamesList = [];
-    connection.query("SELECT device_name from " + correction_table + " where company = '" + company_name + "' and device_name = '" + model_name +"'", function (error, results, fields) {
+    connection.query("SELECT device_name from " + correction_table + " where company = '" + company_name + "' and device_name = '" + model_name + "'", function (error, results, fields) {
         if (error) {
             console.log("error ocurred", error);
             res.send({
@@ -144,7 +124,7 @@ exports.getData = function (req, res) {
     var model_name = req.body.model;
     var device_name = req.body.device_name;
     var dataList = [];
-    connection.query("SELECT device_name from " + correction_table + " where company = '" + company_name + "' and device_name = '" + model_name +"' and device_name"+device_name+"'", function (error, results, fields) {
+    connection.query("SELECT device_name from " + correction_table + " where company = '" + company_name + "' and device_name = '" + model_name + "' and device_name" + device_name + "'", function (error, results, fields) {
         if (error) {
             console.log("error ocurred", error);
             res.send({

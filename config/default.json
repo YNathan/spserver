@@ -1,11 +1,11 @@
 {
   "MySql": {
-      "host": "185.56.72.220",
-      "user": "speakerphoneco",
-      "password":"Miata_123",
-      "database":"speakerphoneco"
+    "host": "185.56.72.220",
+    "user": "speakerphoneco",
+    "password": "speaker365365",
+    "database": "speakerphoneco_laboratory"
   },
-  "Server":{
+  "Server": {
     "port": 5611
   }
 }
