@@ -19,8 +19,8 @@ router.get('/get_dictionary', getData.getDictionary);
 router.get('/get_corrections', getData.getCorrections);
 router.post('/get_companys', getData.getCompanys);
 router.post('/get_model', getData.getModel);
-router.get('/get_device_name', getData.getDeviceName);
-router.get('/get_dictionary', getData.getDictionary);
+router.post('/get_device_name', getData.getDeviceName);
+router.post('/get_data', getData.getData);
 // test route
 router.get('/', function (req, res) {
     res.sendFile(__dirname +'/public/index.html');
