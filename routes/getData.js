@@ -30,6 +30,7 @@ function handleDisconnect() {
 handleDisconnect();
 
 exports.getDictionary = function (req, res) {
+	console.log('User At Ip: ',req.connection.remoteAddress,', is connected');
     var response = {
         "code": 200,
         "dictionary": []

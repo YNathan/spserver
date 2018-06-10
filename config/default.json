@@ -1,8 +1,8 @@
 {
   "MySql": {
-    "host": "185.56.72.220",
-    "user": "speakerphoneco",
-    "password": "speaker365365",
+    "host": "127.0.0.1",
+    "user": "root",
+    "password": "sh123456",
     "database": "speakerphoneco_laboratory"
   },
   "Server": {
