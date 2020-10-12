@@ -231,6 +231,7 @@ router.get('/company', getCompany);
 router.get('/devicenames', getDeviceName);
 router.get('/model', getModel);
 router.get('/all', getAll);
+router.get('/alldata', getAllData);
 
 
 // test route
